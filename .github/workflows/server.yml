@@ -1,0 +1,42 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  server-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Step 3: Install server dependencies
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./server
+
+      # Step 4: Run ESLint for code linting
+      - name: Run ESLint
+        run: npx eslint . --ext .js,.ts
+        working-directory: ./server
+
+      # Step 5: Run tests
+      - name: Run tests
+        run: npm test -- --watchAll=false
+        working-directory: ./server
+
+      # Step 6: Build server (if applicable)
+      - name: Build server
+        run: npm run build
+        working-directory: ./server
