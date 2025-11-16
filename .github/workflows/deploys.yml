@@ -1,0 +1,67 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, staging]  # main = production, staging = staging
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      MONGO_URI: ${{ secrets.MONGO_URI }}
+      STAGING_URL: ${{ secrets.STAGING_URL }}
+      PROD_URL: ${{ secrets.PROD_URL }}
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+
+    steps:
+      # 1. Checkout code
+      - uses: actions/checkout@v4
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 3. Cache dependencies
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            server/node_modules
+            client/CrowdFunding/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # 4. Install server dependencies
+      - name: Install Server Dependencies
+        run: cd server && npm install
+
+      # 5. Install client dependencies
+      - name: Install Client Dependencies
+        run: cd client/CrowdFunding && npm install
+
+      # 6. Run server tests
+      - name: Run Server Tests
+        run: cd server && npm test
+
+      # 7. Run client tests
+      - name: Run Client Tests
+        run: cd client/CrowdFunding && npm test
+
+      # 8. Build client
+      - name: Build Client
+        run: cd client/CrowdFunding && npm run build
+
+      # 9. Deploy
+      - name: Deploy to Environment
+        run: |
+          if [ "${GITHUB_REF_NAME}" == "staging" ]; then
+            echo "Deploying to Staging..."
+            curl -X POST -H "Authorization: Bearer $RENDER_API_KEY" \
+              -d '{}' $STAGING_URL
+          elif [ "${GITHUB_REF_NAME}" == "main" ]; then
+            echo "Deploying to Production..."
+            curl -X POST -H "Authorization: Bearer $RENDER_API_KEY" \
+              -d '{}' $PROD_URL
