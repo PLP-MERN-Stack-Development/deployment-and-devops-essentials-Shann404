@@ -165,7 +165,6 @@ router.get('/me', auth, async (req, res) => {
 // In your backend routes/auth.js - add this simple Google route
 router.post('/google', async (req, res) => {
   try {
-    const { token } = req.body; // Google ID token from frontend
     
     // For now, just create a mock user - FREE
     const mockUser = {
@@ -182,7 +181,7 @@ router.post('/google', async (req, res) => {
       token: 'mock_jwt_token',
       user: mockUser
     });
-  } catch (error) {
+  } catch {
     res.status(400).json({ message: 'Google sign-in failed' });
   }
 });

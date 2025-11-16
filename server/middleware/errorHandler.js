@@ -1,5 +1,5 @@
 // server/middleware/errorHandler.js
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res) => {
   console.error(err.stack); // log full error stack
   res.status(err.status || 500).json({
     success: false,

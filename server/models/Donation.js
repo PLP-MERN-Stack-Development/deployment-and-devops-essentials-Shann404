@@ -34,10 +34,8 @@ const donationSchema = new mongoose.Schema({
   message: String,
   isAnonymous: {
     type: Boolean,
-    default: false
-  },
-  message: String,
-  feeAmount: Number,
+    default: false,
+    feeAmount: Number,
   netAmount: Number,
   receiptUrl: String,
   refunds: [{
@@ -46,6 +44,8 @@ const donationSchema = new mongoose.Schema({
     processedAt: Date,
     adminNotes: String
   }]
+  },
+ 
 }, {
   timestamps: true
 });

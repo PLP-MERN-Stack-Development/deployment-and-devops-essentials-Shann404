@@ -2,6 +2,7 @@ const express = require('express');
 const Donation = require('../models/Donation');
 const Campaign = require('../models/Campaign');
 const { auth } = require('../middleware/auth');
+const Donor = require('../models/Donor');
 
 const router = express.Router();
 

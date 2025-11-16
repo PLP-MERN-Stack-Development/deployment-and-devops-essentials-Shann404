@@ -314,7 +314,7 @@ router.put('/admin/:studentId/verify', auth, async (req, res) => {
     }
 
     const { studentId } = req.params;
-    const { action, notes } = req.body;
+    const { action } = req.body;
 
     const studentProfile = await StudentProfile.findById(studentId).populate('user');
     if (!studentProfile) {
