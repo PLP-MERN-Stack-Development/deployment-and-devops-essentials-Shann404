@@ -6,6 +6,10 @@ const path = require('path');
 const errorHandler = require('./middleware/errorHandler');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const healthRoute = require('./routes/health');
+const Sentry = require('@sentry/node');
+
+
 
 
 
@@ -30,6 +34,7 @@ if (process.env.NODE_ENV === 'production') {
 
 app.use(express.json())
 
+Sentry.init({ dsn: process.env.SENTRY_DSN });
 
 
 // Static files for uploaded documents
@@ -51,6 +56,10 @@ app.use('/api/students', require('./routes/students'));
 
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/donors',  require('./routes/donors'));
+app.use('/api', healthRoute);
+app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.Handlers.errorHandler());
+
 
 // Basic route
 app.get('/', (req, res) => {
